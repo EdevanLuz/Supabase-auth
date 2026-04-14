@@ -1,10 +1,21 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-const urlSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const chaveAnonimaSupabase = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
 export const atualizarSessao = async (requisicao: NextRequest) => {
+  const urlSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const chaveAnonimaSupabase = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!urlSupabase || !chaveAnonimaSupabase) {
+    // Se as variáveis estiverem faltando no middleware, retornamos a resposta normal
+    // para evitar que o app quebre completamente, mas logamos o erro.
+    console.error("Erro: Variáveis de ambiente do Supabase ausentes no middleware.");
+    return NextResponse.next({
+      request: {
+        headers: requisicao.headers,
+      },
+    });
+  }
+
   let respostaSupabase = NextResponse.next({
     request: {
       headers: requisicao.headers,
