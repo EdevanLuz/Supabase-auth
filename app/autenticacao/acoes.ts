@@ -54,3 +54,23 @@ export async function sairDaSessao() {
   revalidatePath('/', 'layout');
   redirect('/entrar');
 }
+
+export async function entrarComGoogle() {
+  const supabase = await criarClienteServidor();
+  const urlApp = process.env.APP_URL || 'http://localhost:3000';
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${urlApp}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    return redirect('/entrar?erro=' + encodeURIComponent(error.message));
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+}
